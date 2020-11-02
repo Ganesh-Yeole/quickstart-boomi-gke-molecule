@@ -6,7 +6,7 @@
 {% set CLUSTER_NAME = properties["CLUSTER_NAME"] %}
 
 resources:
-- name: boomi-cloudbuild
+- name: {{ deployment }}-cloudbuild
   action: gcp-types/cloudbuild-v1:cloudbuild.projects.builds.create
   metadata:
     runtimePolicy:
@@ -18,14 +18,12 @@ resources:
       name: 'gcr.io/cloud-builders/git'
       args:
       - clone
-      - -b
-      - develop
-      - https://github.com/vilvamani/gcp-deployment-manager.git
+      - https://github.com/vilvamani/quickstart-boomi-gke-molecule.git
 
     - id: 'build_image'
       name: 'gcr.io/cloud-builders/docker'
       args: ['build', '--tag=gcr.io/$PROJECT_ID/helm:${_HELM_VERSION}', '--tag=gcr.io/$PROJECT_ID/helm:latest', '--build-arg', 'HELM_VERSION=v${_HELM_VERSION}', '.']
-      dir: gcp-deployment-manager/kubernetes
+      dir: quickstart-boomi-gke-molecule/kubernetes
       waitFor: [git_clone]
 
     - id: helm_repo_update
@@ -80,7 +78,7 @@ resources:
         - --set
         - secrets.username={{ properties["username"] }},secrets.password={{ properties["password"] }},secrets.account={{ properties["account"] }},volume.server={{ properties["ipaddress"] }},storage.reservedIpRange={{ properties["reservedIpRange"] }},storage.network={{ properties["network"] }},ingress.staticIpName={{ properties["ingressStaticIpName"] }}
         - '.'
-      dir: gcp-deployment-manager/kubernetes/helm
+      dir: quickstart-boomi-gke-molecule/kubernetes/helm
       env:
         - CLOUDSDK_COMPUTE_REGION={{ region }}
         - CLOUDSDK_CONTAINER_CLUSTER={{ CLUSTER_NAME }}
@@ -93,7 +91,7 @@ resources:
         - apply
         - --filename=./templates/boomi_molecule_gke_hpa.yaml
         - --validate=false
-      dir: gcp-deployment-manager/kubernetes/helm
+      dir: quickstart-boomi-gke-molecule/kubernetes/helm
       env:
         - CLOUDSDK_COMPUTE_REGION={{ region }}
         - CLOUDSDK_CONTAINER_CLUSTER={{ CLUSTER_NAME }}
