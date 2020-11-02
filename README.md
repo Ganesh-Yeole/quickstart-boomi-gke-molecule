@@ -9,21 +9,21 @@ gcloud projects add-iam-policy-binding [project-id] --member=serviceAccount:[pro
 ### Step 2: Open GCP CloudShell and clone the project repository.
 
 ```
-git clone https://github.com/vilvamani/quickstart-boomi-gke-molecule.git && cd quickstart-boomi-gke-molecule
+git clone https://github.com/vilvamani/quickstart-boomi-gke-molecule.git boomi_quickstart && cd boomi_quickstart
 ```
 
 ### Step 3: Update Boomi Username, Password and Account details in the config.jinja file or config.jinja.schema.
 
 ```
-  BoomiUsername:
+  boomiUserEmailID:
     type: string
     default: vilvamani007@gmail.com
 
-  BoomiPassword:
+  boomiPassword:
     type: string
     default: google#2020
 
-  BoomiAccount:
+  boomiAccountID:
     type: string
     default: google-microsoft
 ```

@@ -1,9 +1,23 @@
 # Copyright 2020 Dell Boomi. All rights reserved.
 
+{% import "path_utils.jinja" as path_utils with context %}
+
 {% set project = env["project"] %}
 {% set deployment = env["deployment"] %}
-{% set region = properties["region"] %}
-{% set CommonTags = properties["CommonTags"] %}
+{% set region = path_utils.zoneToRegion(properties["zone"]) %}
+{% set zone = properties["zone"] %}
+{% set machineType = properties["machineType"] %}
+{% set bootDiskType = properties["bootDiskType"] %}
+
+{% set enableRegionalGKECluster = "Regional" if properties["enableRegionalGKECluster"] else "Zonal" %}
+{% set gkeMachineType = properties["gkeMachineType"] %}
+{% set maxNodePerZone = properties["maxNodePerZone"] %}
+{% set diskSizeGb = properties["diskSizeGb"] %}
+
+{% set boomiUserEmailID = properties["boomiUserEmailID"] %}
+{% set boomiPassword = properties["boomiPassword"] %}
+{% set boomiAccountID = properties["boomiAccountID"] %}
+{% set helmGITRepoURL = properties["helmGITRepoURL"] %}
 
 resources:
 
@@ -122,7 +136,7 @@ resources:
   type: cloud_filestore.py
   properties:
     description: {{ deployment }} File Store
-    location: {{ properties["zone"] }}
+    location: {{ zone }}
     tier: STANDARD
     fileShares:
       - name: boomifileshare
@@ -133,8 +147,9 @@ resources:
 - name: {{ deployment }}-gke-cluster
   type: gke.py
   properties:
-    clusterLocationType: Regional
+    clusterLocationType: {{ enableRegionalGKECluster }}
     region: {{ region }}
+    zone: {{ zone }}
     cluster:
       name: {{ deployment }}-gke-cluster
       description: {{ deployment }} k8s Cluster
@@ -144,24 +159,32 @@ resources:
       addonsConfig:
         httpLoadBalancing:
           disabled: false
-        gcePersistentDiskCsiDriverConfig:
-          enabled: true
       nodePools:
         - name: {{ deployment }}-gke-pool
+          {% if properties["enableRegionalGKECluster"] == True %}
           initialNodeCount: 1
+          {% else %}
+          initialNodeCount: 3
+          {% endif %}
           version: 1.17.12-gke.1501
           config:
-            machineType: n1-standard-1
-            diskSizeGb: 50
+            machineType: {{ gkeMachineType }}
+            diskSizeGb: {{ diskSizeGb }}
             serviceAccount: $(ref.{{ deployment }}-gke-sa.email)
             oauthScopes:
               - https://www.googleapis.com/auth/cloud-platform
+            {% if properties["enableRegionalGKECluster"] == True %}
             workloadMetadataConfig:
               nodeMetadata: SECURE
+            {% endif %}
           autoscaling:
             enabled: True
+            {% if properties["enableRegionalGKECluster"] == True %}
+            minNodeCount: 1
+            {% else %}
             minNodeCount: 3
-            maxNodeCount: 200
+            {% endif %}
+            maxNodeCount: {{ maxNodePerZone }}
           management:
             autoUpgrade: true
             autoRepair: true
@@ -193,10 +216,15 @@ resources:
 - name: {{ deployment }}-gke-cloudbuild
   type: cloudbuild.jinja
   properties:
+    {% if properties["enableRegionalGKECluster"] == True %}
     region: {{ region }}
-    username: {{ properties["BoomiUsername"] }}
-    password: {{ properties["BoomiPassword"] }}
-    account: {{ properties["BoomiAccount"] }}
+    {% else %}
+    region: {{ zone }}
+    {% endif %}
+    helmGITRepoURL: {{ helmGITRepoURL }}
+    boomiUserEmailID: {{ boomiUserEmailID }}
+    boomiPassword: {{ boomiPassword }}
+    boomiAccountID: {{ boomiAccountID }}
     network: $(ref.{{ deployment }}-network.vpcName)
     CLUSTER_NAME: $(ref.{{ deployment }}-gke-cluster.name)
     ipaddress: $(ref.{{ deployment }}-cloud-filestore.fileShareIp)
@@ -208,7 +236,7 @@ resources:
     network: $(ref.{{ deployment }}-network.selfLink)
     publicSubnet: $(ref.{{ deployment }}-{{ region }}-public-subnet.selfLink)
     region: {{ region }}
-    machineType: n1-standard-1
+    machineType: {{ machineType }}
     machineImage: centos-cloud/global/images/family/centos-7
     minSize: 1
     maxSize: 2

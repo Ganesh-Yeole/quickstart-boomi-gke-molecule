@@ -18,12 +18,13 @@ resources:
       name: 'gcr.io/cloud-builders/git'
       args:
       - clone
-      - https://github.com/vilvamani/quickstart-boomi-gke-molecule.git
+      - {{ properties["helmGITRepoURL"] }}
+      - quick_start
 
     - id: 'build_image'
       name: 'gcr.io/cloud-builders/docker'
       args: ['build', '--tag=gcr.io/$PROJECT_ID/helm:${_HELM_VERSION}', '--tag=gcr.io/$PROJECT_ID/helm:latest', '--build-arg', 'HELM_VERSION=v${_HELM_VERSION}', '.']
-      dir: quickstart-boomi-gke-molecule/kubernetes
+      dir: quick_start/kubernetes
       waitFor: [git_clone]
 
     - id: helm_repo_update
@@ -76,9 +77,9 @@ resources:
         - --namespace
         - default
         - --set
-        - secrets.username={{ properties["username"] }},secrets.password={{ properties["password"] }},secrets.account={{ properties["account"] }},volume.server={{ properties["ipaddress"] }},storage.reservedIpRange={{ properties["reservedIpRange"] }},storage.network={{ properties["network"] }},ingress.staticIpName={{ properties["ingressStaticIpName"] }}
+        - secrets.username={{ properties["boomiUserEmailID"] }},secrets.password={{ properties["boomiPassword"] }},secrets.account={{ properties["boomiAccountID"] }},volume.server={{ properties["ipaddress"] }},storage.reservedIpRange={{ properties["reservedIpRange"] }},storage.network={{ properties["network"] }},ingress.staticIpName={{ properties["ingressStaticIpName"] }}
         - '.'
-      dir: quickstart-boomi-gke-molecule/kubernetes/helm
+      dir: quick_start/kubernetes/helm
       env:
         - CLOUDSDK_COMPUTE_REGION={{ region }}
         - CLOUDSDK_CONTAINER_CLUSTER={{ CLUSTER_NAME }}
@@ -91,7 +92,7 @@ resources:
         - apply
         - --filename=./templates/boomi_molecule_gke_hpa.yaml
         - --validate=false
-      dir: quickstart-boomi-gke-molecule/kubernetes/helm
+      dir: quick_start/kubernetes/helm
       env:
         - CLOUDSDK_COMPUTE_REGION={{ region }}
         - CLOUDSDK_CONTAINER_CLUSTER={{ CLUSTER_NAME }}
