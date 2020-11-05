@@ -7,10 +7,13 @@ info:
   version: 1.0
 
 imports:
-- path: boomi_molecule.jinja
+- path: boomi_molecule_existing_vpc.jinja
 
 - name: path_utils.jinja
   path: path_utils.jinja
+
+- name: static_address
+  path: templates/network/static_address.py
 
 - name: apis.py
   path: templates/iam_apis/apis.py
@@ -41,6 +44,7 @@ imports:
 
 required:
   - zone
+  - gkeClusterNetwork
   - machineType
   - gkeMachineType
   - diskSizeGb
@@ -56,6 +60,50 @@ properties:
     x-googleProperty:
       type: GCE_ZONE
 
+  gkeClusterNetwork:
+    type: string
+    default: "default"
+    minItems: 1
+    maxItems: 8
+    x-googleProperty:
+      type: GCE_NETWORK
+      gceNetwork:
+        machineTypeProperty: machineType
+
+  gkeClusterPrivateSubnetwork:
+    type: string
+    default: "default"
+    x-googleProperty:
+      type: GCE_SUBNETWORK
+      zoneProperty: zone
+      gceSubnetwork:
+        networkProperty: gkeClusterNetwork
+
+  gkeClusterPublicSubnetwork:
+    type: string
+    default: "default"
+    x-googleProperty:
+      type: GCE_SUBNETWORK
+      zoneProperty: zone
+      gceSubnetwork:
+        networkProperty: gkeClusterNetwork
+
+  tcp80SourceRanges:
+    type: string
+    default: '0.0.0.0/0, 192.169.0.0/24'
+    x-googleProperty:
+      type: GCE_FIREWALL_RANGE
+      gceFirewall:
+        networkProperty: gkeClusterNetwork
+
+  tcp443SourceRanges:
+    type: string
+    default: '0.0.0.0/0, 192.169.0.0/24'
+    x-googleProperty:
+      type: GCE_FIREWALL_RANGE
+      gceFirewall:
+        networkProperty: gkeClusterNetwork
+        
   machineType:
     type: string
     default: g1-small
@@ -66,21 +114,9 @@ properties:
         minCpu: 1
         minRamGb: 3.75
 
-  tcp80SourceRanges:
-    type: string
-    default: '0.0.0.0/0, 192.169.0.0/24'
-    x-googleProperty:
-      type: GCE_FIREWALL_RANGE
-
-  tcp443SourceRanges:
-    type: string
-    default: '0.0.0.0/0, 192.169.0.0/24'
-    x-googleProperty:
-      type: GCE_FIREWALL_RANGE
-
   enableRegionalGKECluster:
     type: boolean
-    default: True
+    default: False
 
   gkeMachineType:
     type: string

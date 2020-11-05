@@ -19,7 +19,14 @@
 {% set boomiAccountID = properties["boomiAccountID"] %}
 {% set helmGITRepoURL = properties["helmGITRepoURL"] %}
 
+{% set network = path_utils.networkPath(properties["gkeClusterNetwork"]) %}
+{% set privateSubnetwork = path_utils.subnetworkPath(zone, properties["gkeClusterPrivateSubnetwork"]) %}
+{% set publicSubnetwork = path_utils.subnetworkPath(zone, properties["gkeClusterPublicSubnetwork"]) %}
+
 resources:
+
+- name: {{ deployment }}-static-ip
+  type: static_address.py
 
 - name: {{ deployment }}-bastion-sa
   type: iam.v1.serviceAccount
@@ -71,27 +78,10 @@ resources:
       - name: computeApi
         serviceName: compute.googleapis.com
 
-- name: {{ deployment }}-network
-  type: network.py
-  properties:
-    name: {{ deployment }}-network
-    autoCreateSubnetworks: false
-    subnetworks:
-      - name: {{ deployment }}-{{ region }}-public-subnet
-        region: {{ region }}
-        ipCidrRange: 192.168.0.0/21
-        privateIpGoogleAccess: true
-        enableFlowLogs: false
-      - name: {{ deployment }}-{{ region }}-private-subnet
-        region: {{ region }}
-        ipCidrRange: 192.168.8.0/21
-        privateIpGoogleAccess: true
-        enableFlowLogs: false
-
 - name: {{ deployment }}-firewall
   type: firewall.py
   properties:
-    network: $(ref.{{ deployment }}-network.selfLink)
+    network: {{ network }}
     rules:
       - name: {{ deployment }}-allow-ssh-to-bastion
         description: Allow SSH from anywhere to Bastion
@@ -149,10 +139,10 @@ resources:
   type: cloud_router.py
   properties:
     name: {{ deployment }}-{{ region }}-cloud-router
-    network: $(ref.{{ deployment }}-network.selfLink)
+    network: {{ network }}
     region: {{ region }}
     nat-name: {{ deployment }}-{{ region }}-nat
-    subnet: $(ref.{{ deployment }}-{{ region }}-private-subnet.selfLink)
+    subnet: {{ privateSubnetwork }}
 
 - name: {{ deployment }}-cloud-filestore
   type: cloud_filestore.py
@@ -164,7 +154,24 @@ resources:
       - name: boomifileshare
         capacityGb: 1024
     networks:
-      - network: $(ref.{{ deployment }}-network.vpcName)
+      - network: {{ properties["gkeClusterNetwork"] }}
+
+- name: {{ deployment }}-gke-cloudbuild
+  type: cloudbuild.jinja
+  properties:
+    {% if properties["enableRegionalGKECluster"] == True %}
+    region: {{ region }}
+    {% else %}
+    region: {{ zone }}
+    {% endif %}
+    helmGITRepoURL: {{ helmGITRepoURL }}
+    boomiUserEmailID: {{ boomiUserEmailID }}
+    boomiPassword: {{ boomiPassword }}
+    boomiAccountID: {{ boomiAccountID }}
+    network: {{ properties["gkeClusterNetwork"] }}
+    CLUSTER_NAME: $(ref.{{ deployment }}-gke-cluster.name)
+    ipaddress: $(ref.{{ deployment }}-cloud-filestore.fileShareIp)
+    ingressStaticIpName: $(ref.{{ deployment }}-static-ip.staticIpName)
 
 - name: {{ deployment }}-gke-cluster
   type: gke.py
@@ -175,8 +182,8 @@ resources:
     cluster:
       name: {{ deployment }}-gke-cluster
       description: {{ deployment }} k8s Cluster
-      network: $(ref.{{ deployment }}-network.vpcName)
-      subnetwork: $(ref.{{ deployment }}-{{ region }}-private-subnet.selfLink)
+      network: {{ properties["gkeClusterNetwork"] }}
+      subnetwork: {{ privateSubnetwork }}
       initialClusterVersion: 1.17.12-gke.1501
       addonsConfig:
         httpLoadBalancing:
@@ -235,28 +242,11 @@ resources:
               endTime: "2021-11-01T07:00:25Z"
             recurrence: "FREQ=MONTHLY;BYSETPOS=1;BYDAY=SA,SU"
 
-- name: {{ deployment }}-gke-cloudbuild
-  type: cloudbuild.jinja
-  properties:
-    {% if properties["enableRegionalGKECluster"] == True %}
-    region: {{ region }}
-    {% else %}
-    region: {{ zone }}
-    {% endif %}
-    helmGITRepoURL: {{ helmGITRepoURL }}
-    boomiUserEmailID: {{ boomiUserEmailID }}
-    boomiPassword: {{ boomiPassword }}
-    boomiAccountID: {{ boomiAccountID }}
-    network: $(ref.{{ deployment }}-network.vpcName)
-    CLUSTER_NAME: $(ref.{{ deployment }}-gke-cluster.name)
-    ipaddress: $(ref.{{ deployment }}-cloud-filestore.fileShareIp)
-    ingressStaticIpName: $(ref.{{ deployment }}-network.staticIpName)
-
 - name: {{ deployment }}-bastion-instance
   type: bastion_instance.py
   properties:
-    network: $(ref.{{ deployment }}-network.selfLink)
-    publicSubnet: $(ref.{{ deployment }}-{{ region }}-public-subnet.selfLink)
+    network: {{ network }}
+    publicSubnet: {{ publicSubnetwork }}
     region: {{ region }}
     machineType: {{ machineType }}
     machineImage: centos-cloud/global/images/family/centos-7

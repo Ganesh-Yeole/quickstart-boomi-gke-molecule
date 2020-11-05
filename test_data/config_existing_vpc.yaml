@@ -1,0 +1,14 @@
+imports:
+- path: ../boomi_molecule_existing_vpc.jinja
+
+resources:
+- name: boomi-gke-quickstart
+  type: boomi_molecule_existing_vpc.jinja
+  properties:
+    zone: us-central1-a
+    gkeClusterNetwork: default
+    gkeClusterPrivateSubnetwork: default
+    gkeClusterPublicSubnetwork: default
+    boomiUserEmailID: vilvamani007@gmail.com
+    boomiPassword: google#2020
+    boomiAccountID: google-microsoft
