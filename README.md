@@ -43,7 +43,7 @@ git clone https://github.com/Ganesh-Yeole/quickstart-boomi-gke-molecule.git boom
 
   boomiPassword:
     type: string
-    default: NamuCheeky@305
+    default:
 
   boomiAccountID:
     type: string
