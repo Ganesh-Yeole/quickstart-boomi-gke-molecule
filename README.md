@@ -31,7 +31,7 @@ gcloud projects add-iam-policy-binding [project-id] --member=serviceAccount:[pro
 To begin, run these commands to open the quickstart
 
 ```sh
-git clone https://github.com/vilvamani/quickstart-boomi-gke-molecule.git boomi_quickstart && cd boomi_quickstart
+git clone https://github.com/Ganesh-Yeole/quickstart-boomi-gke-molecule.git boomi_quickstart && cd boomi_quickstart
 ```
 
 ## Update Boomi Username, Password and Account details in the config.jinja file or config.jinja.schema.
@@ -39,11 +39,11 @@ git clone https://github.com/vilvamani/quickstart-boomi-gke-molecule.git boomi_q
 ```
   boomiUserEmailID:
     type: string
-    default: vilvamani007@gmail.com
+    default: g.madhukar.yeole@accenture.com
 
   boomiPassword:
     type: string
-    default: google#2020
+    default: NamuCheeky@305
 
   boomiAccountID:
     type: string
