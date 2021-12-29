@@ -105,19 +105,19 @@ properties:
     
   boomiUserEmailID:
     type: string
-    default: vilvamani007@gmail.com
+    default: g.madhukar.yeole@accenture.com
 
   boomiPassword:
     type: string
-    default: google#2020
+    default: NamuCheeky@305
 
   boomiAccountID:
     type: string
-    default: google-microsoft
+    default: accentureengineeringmaste-25T6QY
 
   helmGITRepoURL:
     type: string
-    default: https://github.com/vilvamani/quickstart-boomi-gke-molecule.git
+    default: https://github.com/Ganesh-Yeole/quickstart-boomi-gke-molecule.git
 
 outputs:
   deployment:
