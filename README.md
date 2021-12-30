@@ -17,7 +17,7 @@
 1. Run this command to enable the Deployment Manager and Compute APIs:
 
     ```sh
-    gcloud services enable compute.googleapis.com deploymentmanager.googleapis.com  
+    gcloud services enable compute.googleapis.com deploymentmanager.googleapis.com cloudbuild.googleapis.com 
     ```
 
 ## Adding IAM SecurityAdmin Role to [project-no]@cloudservices.gserviceaccount.com
