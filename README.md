@@ -24,6 +24,7 @@
 
 ```
 gcloud projects add-iam-policy-binding [project-id] --member=serviceAccount:[project-no]@cloudservices.gserviceaccount.com --role=roles/iam.securityAdmin
+gcloud projects add-iam-policy-binding [project-id]  --member=serviceAccount:[project-no]@cloudbuild.gserviceaccount.com --role=roles/container.admin
 ```
 
 ## Open GCP CloudShell and clone the project repository.
