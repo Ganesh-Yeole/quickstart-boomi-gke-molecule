@@ -75,7 +75,7 @@ def generate_config(context):
                 },
                 {
                     'name': 'staticIpName',
-                    'value': 'static-ip'
+                    'value': deployment +'-static-ip'
                 }
             ]
     }
