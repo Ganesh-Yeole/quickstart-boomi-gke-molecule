@@ -12,5 +12,7 @@ spec:
       paths:
       - path: /*
         backend:
-          serviceName: molecule-service
-          servicePort: 80
+          service:
+            name: molecule-service
+            port:
+              number: 80         
