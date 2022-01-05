@@ -10,7 +10,10 @@ spec:
   rules:
   - http:
       paths:
-      - path: /*
+      - path: /
+        pathType: Prefix
         backend:
-          serviceName: molecule-service
-          servicePort: 80
+          service:
+            name: molecule-service
+            port:
+              number: 9090
