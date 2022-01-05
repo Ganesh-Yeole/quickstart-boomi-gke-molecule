@@ -293,3 +293,5 @@ resources:
 
       export HOME='whoami'
       export KUBECONFIG=$HOME/.kube/config
+      
+      gcloud container clusters get-credentials --project={{ project }} --region={{ region }} $(ref.{{ deployment }}-gke-cluster.name)
