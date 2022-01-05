@@ -84,7 +84,7 @@ properties:
 
   gkeMachineType:
     type: string
-    default: g1-small
+    default: e2-standard-4
     x-googleProperty:
       type: GCE_MACHINE_TYPE
       zoneProperty: zone
