@@ -291,7 +291,7 @@ resources:
       sudo mkdir -p /mnt/boominfs
       sudo mount $(ref.{{ deployment }}-cloud-filestore.fileShareIp):/boomifileshare /mnt/boominfs
 
-      #export HOME='whoami'
+      export HOME="$(whoami)"
       export KUBECONFIG=$HOME/.kube/config
       
       gcloud container clusters get-credentials --project={{ project }} --region={{ region }} $(ref.{{ deployment }}-gke-cluster.name)
