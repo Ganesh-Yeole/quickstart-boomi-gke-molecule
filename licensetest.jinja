@@ -1,0 +1,10 @@
+{% set boomiUserEmailID = properties["boomiUserEmailID"] %}
+{% set boomiPassword = properties["boomiPassword"] %}
+{% set boomiAccountID = properties["boomiAccountID"] %}
+{% set helmGITRepoURL = properties["helmGITRepoURL"] %}
+
+resources:
+- name: {{ deployment }}-gke-cluster
+  type: gke.py
+  properties:
+    clusterLocationType: {{ enableRegionalGKECluster }}
