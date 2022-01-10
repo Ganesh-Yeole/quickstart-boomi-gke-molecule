@@ -1,0 +1,4 @@
+imports:
+
+- name: license_validation.sh
+  path: scripts/license_validation.sh
