@@ -10,4 +10,4 @@ result=`/usr/bin/python3 license_validation.py $1 $2 $3 MOLECULE 60`
 status=`echo $result|cut -d, -f1|awk -F':' '{ print $2 }'`
 token=`echo $result|cut -d, -f2|awk -F':' '{ print $2 }'`
 
-echo \{\"license_validation\":\"$status\"\, \"installation_token\":\"$token\"\} 
+echo $token
