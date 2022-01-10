@@ -4,7 +4,5 @@
 {% set helmGITRepoURL = properties["helmGITRepoURL"] %}
 
 resources:
-- name: {{ deployment }}-gke-cluster
-  type: gke.py
-  properties:
-    clusterLocationType: {{ enableRegionalGKECluster }}
+- name: license-check
+  type: license_validation.sh
