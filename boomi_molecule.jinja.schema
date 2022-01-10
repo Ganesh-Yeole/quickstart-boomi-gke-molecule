@@ -109,7 +109,7 @@ properties:
 
   boomiPassword:
     type: string
-    default: NamuCheeky@305
+    default: 
 
   boomiAccountID:
     type: string
