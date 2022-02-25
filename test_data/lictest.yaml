@@ -7,5 +7,5 @@ resources:
   properties:
     zone: us-central1-a
     boomiUserEmailID: g.madhukar.yeole@accenture.com
-    boomiPassword: NamuCheeky@305
+    boomiPassword:
     boomiAccountID: accentureengineeringmaste-25T6QY
