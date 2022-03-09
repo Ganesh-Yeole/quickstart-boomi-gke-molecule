@@ -2,7 +2,7 @@
 
 info:
   title: Boomi Molecule GKE Cluster
-  author: Vilvamani Arumugam <vilvamani007@gmail.com>
+  author: Ganesh Yeole
   description: Deploy Dell Boomi Molecule in GKE
   version: 1.0
 
