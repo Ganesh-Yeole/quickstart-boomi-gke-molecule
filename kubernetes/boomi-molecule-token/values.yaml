@@ -1,7 +1,6 @@
 ---
 secrets:
-  username: testuser
-  password: testpassword
+  token: testpassword
   account: testaccount
 
 volume:
