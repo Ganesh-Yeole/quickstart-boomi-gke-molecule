@@ -4,6 +4,8 @@ metadata:
   name: molecule-service
   labels:
     app: molecule
+  annotations:
+    cloud.google.com/neg: '{"ingress": true}'
 spec:
   selector:
     app: molecule
