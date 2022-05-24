@@ -141,11 +141,11 @@ properties:
     
   boomiUserEmailID:
     type: string
-    default: vilvamani007@gmail.com
+    default: 
 
   boomiPassword:
     type: string
-    default: google#2020
+    default: 
 
   boomiAccountID:
     type: string
