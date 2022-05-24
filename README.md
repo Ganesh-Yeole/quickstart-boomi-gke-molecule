@@ -40,7 +40,7 @@ git clone https://github.com/Ganesh-Yeole/quickstart-boomi-gke-molecule.git boom
 ```
   boomiUserEmailID:
     type: string
-    default: g.madhukar.yeole@accenture.com
+    default: 
 
   boomiPassword:
     type: string
