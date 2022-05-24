@@ -9,6 +9,6 @@ resources:
     gkeClusterNetwork: default
     gkeClusterPrivateSubnetwork: default
     gkeClusterPublicSubnetwork: default
-    boomiUserEmailID: vilvamani007@gmail.com
-    boomiPassword: google#2020
+    boomiUserEmailID: 
+    boomiPassword: 
     boomiAccountID: google-microsoft
